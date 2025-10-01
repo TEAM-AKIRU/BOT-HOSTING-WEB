@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #121212; --surface: #1e1e1e; --primary: #00ffcc; --text: #e0e0e0; --border: #333; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .login-box { background-color: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 40px; text-align: center; width: 100%; max-width: 350px; }
+        .login-box h1 { margin: 0 0 10px; color: var(--primary); }
+        .login-box p { color: #aaa; margin-bottom: 30px; }
+        .google-btn { display: inline-flex; align-items: center; gap: 15px; background-color: #fff; color: #444; padding: 12px 25px; border-radius: 5px; text-decoration: none; font-weight: 600; transition: background-color 0.2s; }
+        .google-btn:hover { background-color: #f1f1f1; }
+        .google-btn img { width: 20px; height: 20px; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>Welcome Back</h1>
+        <p>Log in with your Google account to continue.</p>
+        <a href="{{ url_for('auth_login') }}" class="google-btn">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="Google Logo">
+            <span>Log in with Google</span>
+        </a>
+    </div>
+</body>
+</html>
