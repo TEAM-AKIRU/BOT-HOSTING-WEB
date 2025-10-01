@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block page_title %}Profile & Settings{% endblock %}
+
+{% block head %}
+<style>
+    .profile-card { max-width: 600px; }
+    .google-info { display: flex; align-items: center; gap: 20px; padding: 20px; background-color: #2a2a2a; border-radius: 8px; margin-bottom: 30px; }
+    .google-info img { width: 60px; height: 60px; border-radius: 50%; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 5px; }
+    .form-group input { width: 100%; padding: 10px; background-color: #333; border: 1px solid var(--border); border-radius: 5px; color: var(--text); font-family: var(--font-main); }
+    .form-group pre { background-color: #0d0d0d; padding: 15px; border-radius: 5px; font-family: var(--font-mono); font-size: 13px; white-space: pre-wrap; word-break: break-all; }
+    .btn-save { padding: 12px 25px; background-color: var(--primary); color: #000; border: none; border-radius: 5px; font-weight: 600; cursor: pointer; }
+    .success-msg { color: var(--primary); margin-bottom: 15px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card profile-card">
+    <div class="google-info">
+        <img src="{{ user.picture }}" alt="Google Profile Picture">
+        <div>
+            <strong style="font-size: 20px;">{{ user.name }}</strong>
+            <div style="color: #aaa;">{{ user.email }}</div>
+        </div>
+    </div>
+
+    {% if request.args.get('success') %}
+        <p class="success-msg">Settings saved successfully!</p>
+    {% endif %}
+
+    <form method="post">
+        <div class="form-group">
+            <label for="main_file">Main File Name</label>
+            <input type="text" id="main_file" name="main_file" value="{{ user.main_file }}">
+        </div>
+        <div class="form-group">
+            <label>Default Startup Command</label>
+            <pre>if [[ -d .git ]] && [[ "0" == "1" ]]; then git pull; fi; 
+if [[ ! -z "" ]]; then pip install -U --prefix .local; fi; 
+if [[ -f /home/container/requirements.txt ]]; then pip install -U --prefix .local -r requirements.txt; fi; 
+/usr/local/bin/python /home/container/{{ user.main_file }}</pre>
+        </div>
+        <button type="submit" class="btn-save">Save Changes</button>
+    </form>
+</div>
+{% endblock %}
