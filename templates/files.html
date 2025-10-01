@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}File Manager{% endblock %}
+{% block page_title %}File Manager{% endblock %}
+
+{% block head %}
+<style>
+    .file-actions { display: flex; gap: 10px; margin-bottom: 20px; }
+    .file-actions .btn { padding: 10px 15px; background-color: var(--primary); color: #000; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .file-actions .btn:hover { background-color: var(--primary-dark); }
+    .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; }
+    .file-item { background-color: #2a2a2a; border-radius: 5px; padding: 15px; text-align: center; color: var(--text); text-decoration: none; word-break: break-all; }
+    .file-item i { font-size: 32px; margin-bottom: 10px; color: var(--primary); }
+    .no-files { display: flex; justify-content: center; align-items: center; min-height: 300px; border: 2px dashed var(--border); border-radius: 10px; flex-direction: column; cursor: pointer; }
+    .no-files i { font-size: 60px; color: #444; margin-bottom: 20px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="file-actions">
+        <button class="btn"><i class="fa-solid fa-folder-plus"></i> Create Folder</button>
+        <button class="btn"><i class="fa-solid fa-file-arrow-up"></i> Upload File</button>
+        <button class="btn"><i class="fa-solid fa-folder-arrow-up"></i> Upload Folder</button>
+    </div>
+
+    {% if not files %}
+        <div class="no-files" onclick="alert('Open file upload dialog')">
+            <i class="fa-solid fa-file-circle-xmark"></i>
+            <h3>No Files Here</h3>
+            <p>Click to upload your first file.</p>
+        </div>
+    {% else %}
+        <div class="file-grid">
+            {% for file in files %}
+            <a href="#" class="file-item">
+                <i class="fa-solid {{ 'fa-folder' if file.is_dir else 'fa-file-code' }}"></i>
+                <span>{{ file.name }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
