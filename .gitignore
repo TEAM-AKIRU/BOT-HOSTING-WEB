@@ -1,0 +1,13 @@
+# Environment variables
+.env
+
+# Python virtual environment
+venv/
+__pycache__/
+*.pyc
+
+# Database migration folder
+migrations/
+
+# User data folder (should not be in version control)
+user_data/
