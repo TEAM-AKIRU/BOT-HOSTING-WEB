@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.1.0/css/xterm.css" />
+<script src="https://cdn.jsdelivr.net/npm/xterm@5.1.0/lib/xterm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.7.0/lib/xterm-addon-fit.js"></script>
+<style>
+    .dashboard-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    .controls { display: flex; gap: 10px; margin-bottom: 20px; }
+    .controls button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; font-family: var(--font-main); transition: background-color 0.2s, transform 0.1s; }
+    .controls button:active { transform: scale(0.98); }
+    .btn-start { background-color: #28a745; color: white; } .btn-start:hover { background-color: #218838; }
+    .btn-stop { background-color: #dc3545; color: white; } .btn-stop:hover { background-color: #c82333; }
+    .btn-restart { background-color: #ffc107; color: black; } .btn-restart:hover { background-color: #e0a800; }
+    #terminal-container { height: 400px; background-color: #000; padding: 10px; border-radius: 5px; }
+    .command-bar { display: flex; margin-top: -1px; }
+    .command-bar .prefix { padding: 10px; background-color: #333; border-radius: 0 0 0 5px; font-family: var(--font-mono); }
+    .command-bar input { flex: 1; background-color: #222; border: none; color: var(--text); padding: 10px; font-family: var(--font-mono); outline: none; border-radius: 0 0 5px 0; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+    .stat-card { text-align: center; padding: 15px; }
+    .stat-card .value { font-size: 24px; font-weight: 700; color: var(--primary); }
+    .stat-card .label { font-size: 14px; color: #aaa; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-grid">
+    <div class="card">
+        <div class="controls">
+            <button id="btn-start" class="btn-start">Start</button>
+            <button id="btn-stop" class="btn-stop">Stop</button>
+            <button id="btn-restart" class="btn-restart">Restart</button>
+        </div>
+        <div id="terminal-container"></div>
+        <div class="command-bar">
+            <span class="prefix">&gt;</span>
+            <input type="text" id="command-input" placeholder="Type a command and press Enter...">
+        </div>
+    </div>
+    <div class="card stats-grid">
+        <div class="stat-card">
+            <div class="value">5%</div>
+            <div class="label">CPU Limit</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">100 MB</div>
+            <div class="label">RAM</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">512 GB</div>
+            <div class="label">SSD</div>
+        </div>
+        <div class="stat-card">
+            <div class="value">1 Gbps</div>
+            <div class="label">Network</div>
+        </div>
+         <div class="stat-card">
+            <div class="value">99.9%</div>
+            <div class="label">Uptime</div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const term = new Terminal({
+        cursorBlink: true,
+        fontFamily: "'Fira Code', monospace",
+        theme: { background: '#000000', foreground: '#00FF00' }
+    });
+    const fitAddon = new FitAddon.FitAddon();
+    term.loadAddon(fitAddon);
+    term.open(document.getElementById('terminal-container'));
+    fitAddon.fit();
+
+    function fetchLogs() {
+        fetch('{{ url_for("bot_logs") }}')
+            .then(res => res.text())
+            .then(data => {
+                term.clear();
+                term.write(data.replace(/\n/g, '\r\n'));
+            });
+    }
+
+    async function sendControl(action) {
+        term.write(`\r\n\r\n[SYSTEM] Sending ${action} command...\r\n`);
+        try {
+            const response = await fetch(`{{ url_for('bot_') }}${action}`, { method: 'POST' });
+            const result = await response.json();
+            term.write(`[SYSTEM] ${result.message}\r\n`);
+            setTimeout(fetchLogs, 1000);
+        } catch (error) {
+            term.write(`[SYSTEM] Error: ${error.message}\r\n`);
+        }
+    }
+
+    document.getElementById('btn-start').addEventListener('click', () => sendControl('start'));
+    document.getElementById('btn-stop').addEventListener('click', () => sendControl('stop'));
+    document.getElementById('btn-restart').addEventListener('click', () => sendControl('restart'));
+
+    // Command Input
+    document.getElementById('command-input').addEventListener('keydown', async function (e) {
+        if (e.key === 'Enter') {
+            const command = this.value;
+            this.value = '';
+            await fetch('{{ url_for("bot_command") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ command: command })
+            });
+            term.write(`\r\n> ${command}\r\n`);
+        }
+    });
+
+    fetchLogs();
+    setInterval(fetchLogs, 5000); // Poll for logs every 5 seconds
+});
+</script>
+{% endblock %}
