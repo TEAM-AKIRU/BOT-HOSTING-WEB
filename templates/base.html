@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bot Hosting{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #121212; --surface: #1e1e1e; --primary: #00ffcc;
+            --primary-dark: #00b38f; --text: #e0e0e0; --border: #333;
+            --font-main: 'Inter', sans-serif; --font-mono: 'Fira Code', monospace;
+        }
+        body { background-color: var(--bg-dark); color: var(--text); font-family: var(--font-main); margin: 0; display: flex; min-height: 100vh; }
+        .sidebar { width: 240px; background-color: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 0; }
+        .sidebar .logo { font-size: 24px; font-weight: 700; color: var(--primary); text-align: center; padding: 0 20px 20px; border-bottom: 1px solid var(--border); }
+        .sidebar nav a { display: flex; align-items: center; gap: 15px; padding: 15px 25px; color: var(--text); text-decoration: none; font-weight: 600; transition: background-color 0.2s, color 0.2s; }
+        .sidebar nav a.active, .sidebar nav a:hover { background-color: rgba(0, 255, 204, 0.1); color: var(--primary); }
+        .sidebar nav a i { width: 20px; text-align: center; }
+        .sidebar .profile-section { margin-top: auto; padding: 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+        .sidebar .profile-section img { width: 40px; height: 40px; border-radius: 50%; }
+        .main-content { flex: 1; padding: 30px; }
+        .content-header { margin-bottom: 25px; }
+        .content-header h1 { margin: 0; font-size: 28px; }
+        .card { background-color: var(--surface); border-radius: 8px; border: 1px solid var(--border); padding: 20px; }
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; flex-direction: row; align-items: center; padding: 0; justify-content: space-between; }
+            .sidebar .logo { padding: 15px; border: none; }
+            .sidebar nav { display: flex; }
+            .sidebar nav a { padding: 15px; } .sidebar nav a span { display: none; }
+            .sidebar .profile-section { display: none; }
+            .main-content { padding: 20px; }
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo">BotHost</div>
+        <nav>
+            <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' else '' }}"><i class="fa-solid fa-terminal"></i> <span>Dashboard</span></a>
+            <a href="{{ url_for('files') }}" class="{{ 'active' if request.endpoint == 'files' else '' }}"><i class="fa-solid fa-folder"></i> <span>Files</span></a>
+            <a href="{{ url_for('profile') }}" class="{{ 'active' if request.endpoint == 'profile' else '' }}"><i class="fa-solid fa-user-cog"></i> <span>Profile</span></a>
+        </nav>
+        <div class="profile-section">
+            <img src="{{ user.picture }}" alt="User Avatar">
+            <div>
+                <strong>{{ user.name }}</strong>
+                <small style="display: block; color: #888;">{{ user.email }}</small>
+            </div>
+        </div>
+    </aside>
+    <main class="main-content">
+        <div class="content-header">
+            <h1>{% block page_title %}{% endblock %}</h1>
+        </div>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
