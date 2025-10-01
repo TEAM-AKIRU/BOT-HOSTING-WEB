@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn instance to serve the Bot Hosting app
+After=network.target
+
+[Service]
+User=root # Or a dedicated user for better security
+Group=www-data
+WorkingDirectory=/var/www/bothost # This will be replaced by the script
+ExecStart=/var/www/bothost/venv/bin/gunicorn --config /var/www/bothost/gunicorn_config.py app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
