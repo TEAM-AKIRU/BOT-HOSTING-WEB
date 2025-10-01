@@ -1,7 +1,7 @@
 Flask
 Flask-SQLAlchemy
 Flask-Migrate
-PyMySQL
+# PyMySQL is no longer needed
 Authlib
 python-dotenv
 gunicorn
