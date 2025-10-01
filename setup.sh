@@ -2,6 +2,7 @@
 
 # ==============================================================================
 # Bot Hosting Platform Auto-Deploy Script (SQLite Local Storage Version)
+# Version 3.0 - Includes fixes for dependencies and database initialization.
 # ==============================================================================
 # This script installs and configures the application using a local SQLite
 # database, removing the need for a separate MySQL server.
@@ -44,7 +45,6 @@ prompt_for_input "Enter your Google OAuth Client Secret" GOOGLE_CLIENT_SECRET
 print_header "Installing System Dependencies"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-# We no longer need mysql-server, which simplifies this step greatly.
 apt-get install -y --no-install-recommends python3-pip python3-venv git nginx curl
 
 # --- Step 4: Application Setup ---
@@ -86,7 +86,19 @@ echo "✅ Dependencies installed."
 # Run database migrations to create the local app.db file
 echo "Initializing local SQLite database..."
 export $(grep -v '^#' .env | xargs) # Load .env for flask command
+
+# === FIX APPLIED HERE ===
+# 1. Initialize the migrations folder if it doesn't exist.
+#    The '|| true' part ensures the script doesn't stop if the folder already exists.
+flask db init || true
+
+# 2. Create an initial migration script based on the models in app.py.
+flask db migrate -m "Initial database setup" || echo "No new model changes to migrate."
+
+# 3. Apply the migration to the database, creating the tables.
 flask db upgrade
+# === END OF FIX ===
+
 echo "✅ Local database schema is ready."
 deactivate
 
